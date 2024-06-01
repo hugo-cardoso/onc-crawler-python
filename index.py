@@ -30,6 +30,7 @@ class Crawler:
         self.__airport_logger(airport)
         
     def init(self):
+        AirportsRepository.prepare()
         workers_count = int(os.environ.get('WORKERS_COUNT'))
         
         print('Start crawler with: ' + str(workers_count) + ' workers')

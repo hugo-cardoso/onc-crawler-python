@@ -1,6 +1,6 @@
 import requests, os
 from xml.etree import ElementTree as Et
-from airport import Airport, AirportChart
+from airport import Airport, AirportLocation, AirportChart, AirportRunway
 
 class DeceaApiService:
     api_url = 'http://aisweb.decea.gov.br/api'
@@ -21,9 +21,46 @@ class DeceaApiService:
             if document.find('AeroCode') is not None:
                 airport = Airport(icao_code)
                 
-                airportName = document.find('name')
-                if airportName is not None:
-                    airport.set_name(airportName.text.strip())
+                name_element = document.find('name')
+                if name_element is not None:
+                    airport.set_name(name_element.text.strip())
+                
+                # Runways
+                runway_elements = document.find('runways').findall('runway')
+                if runway_elements is not None:
+                    runways: list[AirportRunway] = []
+                    
+                    for runway_element in runway_elements:
+                        runway = AirportRunway(runway_element.find('ident').text)
+                        
+                        width_element = runway_element.find('width')
+                        if width_element is not None:
+                            runway.set_width(int(width_element.text))
+                            
+                        length_element = runway_element.find('length')
+                        if length_element is not None:
+                            runway.set_length(int(length_element.text))
+                        
+                        runways.append(runway)
+                    
+                    airport.set_runway_list(runways)
+                
+                # Location
+                location = AirportLocation()
+                state_element = document.find('uf')
+                if state_element is not None:
+                    location.set_state_or_province(state_element.text)
+                city_element = document.find('city')
+                if city_element is not None:
+                    location.set_city(city_element.text)
+                lat_element = document.find('lat')
+                if lat_element is not None:
+                    location.set_lat(lat_element.text)
+                lng_element = document.find('lng')
+                if lng_element is not None:
+                    location.set_lng(lng_element.text)
+                    
+                airport.set_location(location)
                 
                 return airport
         except:
