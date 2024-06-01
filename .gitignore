@@ -1,1 +1,4 @@
 env/
+airports/
+__pycache__/
+.env
