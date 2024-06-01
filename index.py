@@ -26,11 +26,10 @@ class Crawler:
         airport_charts = self.decea_api_service.get_airport_charts(icao_code)
         airport.set_chart_list(airport_charts)
         
-        self.airports_repository.create(airport)
+        self.airports_repository.create_or_update(airport)
         self.__airport_logger(airport)
         
     def init(self):
-        AirportsRepository.prepare()
         workers_count = int(os.environ.get('WORKERS_COUNT'))
         
         print('Start crawler with: ' + str(workers_count) + ' workers')
@@ -39,7 +38,7 @@ class Crawler:
             self.__page_logger('Start page:', page)
             airports_icao_list = self.decea_api_service.get_airports_icao_list(page)
             with concurrent.futures.ThreadPoolExecutor(max_workers=workers_count) as executor:
-                futures = [executor.submit(self.find_airport, icao_code) for icao_code in airports_icao_list]
+                [executor.submit(self.find_airport, icao_code) for icao_code in airports_icao_list]
             self.__page_logger('End page:', page)
 
 crawler = Crawler()

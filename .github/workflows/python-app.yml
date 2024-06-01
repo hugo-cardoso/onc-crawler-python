@@ -29,10 +29,6 @@ jobs:
         API_DECEA_KEY: ${{ secrets.API_DECEA_KEY }}
         API_DECEA_PASS: ${{ secrets.API_DECEA_PASS }}
         WORKERS_COUNT: ${{ vars.WORKERS_COUNT }}
+        DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
       run: |
         python index.py
-    - name: Archive airports artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        path: |
-          airports
