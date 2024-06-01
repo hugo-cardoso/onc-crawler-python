@@ -28,6 +28,7 @@ jobs:
       env:
         API_DECEA_KEY: ${{ secrets.API_DECEA_KEY }}
         API_DECEA_PASS: ${{ secrets.API_DECEA_PASS }}
+        WORKERS_COUNT: ${{ vars.WORKERS_COUNT }}
       run: |
         python index.py
     - name: Archive airports artifacts

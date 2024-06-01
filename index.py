@@ -1,4 +1,4 @@
-import concurrent.futures
+import os, concurrent.futures
 from decea_api_service import *
 from airports_repository import *
 from airport import *
@@ -30,10 +30,14 @@ class Crawler:
         self.__airport_logger(airport)
         
     def init(self):
+        workers_count = int(os.environ.get('WORKERS_COUNT'))
+        
+        print('Start crawler with: ' + str(workers_count) + ' workers')
+        
         for page in range(1, (self.pages_count + 1)):
             self.__page_logger('Start page:', page)
             airports_icao_list = self.decea_api_service.get_airports_icao_list(page)
-            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=workers_count) as executor:
                 futures = [executor.submit(self.find_airport, icao_code) for icao_code in airports_icao_list]
             self.__page_logger('End page:', page)
 
