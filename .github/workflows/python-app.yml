@@ -30,5 +30,8 @@ jobs:
         API_DECEA_PASS: ${{ secrets.API_DECEA_PASS }}
         WORKERS_COUNT: ${{ vars.WORKERS_COUNT }}
         DB_CONNECTION_STRING: ${{ secrets.DB_CONNECTION_STRING }}
+        AWS_REGION: ${{ secrets.AWS_REGION }}
+        AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY }}
+        AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_KEY }}
       run: |
         python index.py
