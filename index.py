@@ -1,43 +1,41 @@
-import json, os, concurrent.futures
-from decea_api import *
+import concurrent.futures
+from decea_api_service import *
+from airports_repository import *
+from airport import *
 
-def airport_logger(airport:Airport):
-    def create_brackets(value:str):
-        return "[" + value + "]"
+class Crawler:
+    decea_api_service = DeceaApiService()
+    airports_repository = AirportsRepository()
+    pages_count = decea_api_service.get_airports_pages_count()
     
-    print(create_brackets(airport.icao_code) + " - " + airport.name + " " + create_brackets(str(len(airport.chart_list))))
-
-def find_airport(icao_code):
-    airport = get_airport(icao_code)
+    def __page_logger(self, text:str, page:int):
+        print(text, str(page) + "/" + str(self.pages_count))
     
-    if airport is None:
-        return None
+    def __airport_logger(self, airport:Airport):
+        def create_brackets(value:str):
+            return "[" + value + "]"
+        
+        print(create_brackets(airport.icao_code) + " - " + airport.name + " " + create_brackets(str(len(airport.chart_list))))
+        
+    def find_airport(self, icao_code:str):
+        airport = self.decea_api_service.get_airport(icao_code)
+        
+        if airport is None:
+            return None
+        
+        airport_charts = self.decea_api_service.get_airport_charts(icao_code)
+        airport.set_chart_list(airport_charts)
+        
+        self.airports_repository.create(airport)
+        self.__airport_logger(airport)
+        
+    def init(self):
+        for page in range(1, (self.pages_count + 1)):
+            self.__page_logger('Start page:', page)
+            airports_icao_list = self.decea_api_service.get_airports_icao_list(page)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
+                futures = [executor.submit(self.find_airport, icao_code) for icao_code in airports_icao_list]
+            self.__page_logger('End page:', page)
 
-    airport.set_chart_list(get_airport_charts(icao_code))
-    
-    if not os.path.exists('airports'):
-        os.makedirs('airports')
-    
-    with open("airports/" + airport.icao_code + '.json', 'w', encoding='utf-8') as f:
-        json.dump({
-            'icao_code': airport.icao_code,
-            'name': airport.name,
-            'chart_list': [
-                {
-                    'id': chart.id,
-                    'name': chart.name
-                }
-                for chart in airport.chart_list
-            ]
-        }, f, ensure_ascii=False, indent=4)
-
-    airport_logger(airport)
-
-pages_count = get_airports_pages_count()
-
-for page in range(1, (pages_count + 1)):
-    print('Start page:', str(page) + "/" + str(pages_count))
-    airports_icao_list = get_airports_icao_list(page)
-    with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-        futures = [executor.submit(find_airport, icao_code) for icao_code in airports_icao_list]
-    print('End page:', page)
+crawler = Crawler()
+crawler.init()
