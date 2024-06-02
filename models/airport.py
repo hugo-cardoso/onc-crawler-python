@@ -1,6 +1,6 @@
-from airport_chart import AirportChart
-from airport_runway import AirportRunway
-from airport_location import AirportLocation
+from models.airport_chart import AirportChart
+from models.airport_runway import AirportRunway
+from models.airport_location import AirportLocation
 
 class Airport:
     name:str

@@ -1,12 +1,12 @@
 import os
-from airports_charts_s3_repository import AirportsChartsS3Repository
-from airport import Airport
+from services.airport_chart_service import AirportChartService
+from models.airport import Airport
 from pymongo import MongoClient
 
 class AirportsRepository:
     mongo_client = MongoClient(os.environ.get('DB_CONNECTION_STRING'))
     airports_collection = mongo_client['onc']['airports']
-    airports_charts_s3_repository = AirportsChartsS3Repository()
+    airports_charts_s3_service = AirportChartService()
     
     def __create_airport_object(self, airport:Airport):
         return {
@@ -50,7 +50,7 @@ class AirportsRepository:
         airport_saved = self.find_by_icao(airport.icao_code)
         
         for chart in airport.chart_list:
-            self.airports_charts_s3_repository.upload_chart(airport.icao_code, chart)  
+            self.airports_charts_s3_service.save_chart(airport.icao_code, chart)  
         
         if airport_saved is None:
             self.create(airport)

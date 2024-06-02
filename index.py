@@ -1,7 +1,7 @@
 import os, concurrent.futures
-from decea_api_service import *
-from airports_repository import *
-from airport import *
+from services.decea_api_service import DeceaApiService
+from repositories.airports_repository import AirportsRepository
+from models.airport import *
 
 class Crawler:
     decea_api_service = DeceaApiService()

@@ -1,6 +1,7 @@
 import requests, os
 from xml.etree import ElementTree as Et
-from airport import Airport, AirportLocation, AirportChart, AirportRunway
+
+from models.airport import Airport, AirportChart, AirportLocation, AirportRunway
 
 class DeceaApiService:
     api_url = 'http://aisweb.decea.gov.br/api'
