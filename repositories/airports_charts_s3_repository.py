@@ -21,7 +21,18 @@ class AirportsChartsS3Repository:
             else:
                 raise
             
-    def upload_chart(self, file_name:str, file_content: bytes):
+    def get_files(self, folder_name:str):
+        response = self.s3_client.list_objects_v2(Bucket=self.bucket_name, Prefix=folder_name)
+        
+        if 'Contents' in response:
+            return [file['Key'].replace(f'{folder_name}/', '') for file in response['Contents']]
+        else:
+            return []
+        
+    def delete_file(self, object_name:str):
+        self.s3_client.delete_object(Bucket=self.bucket_name, Key=object_name)
+            
+    def upload_file(self, file_name:str, file_content: bytes):
         chart_stream = BytesIO(file_content)
         
         self.s3_client.upload_fileobj(

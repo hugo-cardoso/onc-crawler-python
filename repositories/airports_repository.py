@@ -48,9 +48,8 @@ class AirportsRepository:
   
     def create_or_update(self, airport:Airport):
         airport_saved = self.find_by_icao(airport.icao_code)
-        
-        for chart in airport.chart_list:
-            self.airports_charts_s3_service.save_chart(airport.icao_code, chart)  
+            
+        self.airports_charts_s3_service.save_charts(airport.icao_code, airport.chart_list)
         
         if airport_saved is None:
             self.create(airport)
